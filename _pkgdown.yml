@@ -1,0 +1,41 @@
+url: https://leadership-research.github.io/askr/
+
+template:
+  bootstrap: 5
+
+home:
+  title: askr
+  description: Ask AI models directly from R.
+  sidebar:
+    structure: [links, license, community, citation, dev]
+
+navbar:
+  logo:
+    image: man/figures/askr-logo.png
+    href: index.html
+  structure:
+    left: [reference, articles]
+    right: [search, github]
+
+reference:
+  - title: Request APIs
+    desc: Send prompts to Azure-hosted LLMs.
+    contents:
+      - ask
+      - ask_raw
+  - title: Model Discovery
+    desc: Explore available models.
+    contents:
+      - list_available_models
+  - title: Output
+    desc: Print and inspect responses.
+    contents:
+      - print.askr_response
+
+articles:
+  - title: Getting Started
+    contents:
+      - getting-started
+  - title: Architecture
+    contents:
+      - architecture-overview

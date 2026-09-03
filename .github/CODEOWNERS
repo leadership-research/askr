@@ -1,0 +1,21 @@
+# CODEOWNERS
+# Each line is a file pattern followed by one or more owners.
+# Owners are automatically requested for review when a PR touches matching files.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: all files require review from the maintainer
+*                               @leadership-research
+
+# CI / security-sensitive config requires explicit maintainer sign-off
+.github/                        @leadership-research
+SECURITY.md                     @leadership-research
+DESCRIPTION                     @leadership-research
+NAMESPACE                       @leadership-research
+
+# Core API surface
+R/ask.R                         @leadership-research
+R/ask_raw.R                     @leadership-research
+R/constants.R                   @leadership-research
+
+# Model registry — changes here affect all callers
+inst/config/models.json         @leadership-research

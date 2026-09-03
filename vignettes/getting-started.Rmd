@@ -1,0 +1,155 @@
+---
+title: "Getting Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+`askr` provides a minimal interface for calling Azure-hosted LLMs from R.
+
+## Install and load
+
+```{r eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("leadership-research/askr")
+library(askr)
+```
+
+## Configure credentials
+
+`askr` requires three environment variables. The recommended approach is to add
+them to `~/.Renviron` so they are set automatically on every R session:
+
+```
+API_KEY=your-azure-api-token
+ASKR_OPENAI_BASE=https://your-resource.cognitiveservices.azure.com
+ASKR_OSS_BASE=https://your-resource.services.ai.azure.com
+```
+
+Then reload without restarting R:
+
+```{r eval=FALSE}
+readRenviron("~/.Renviron")
+```
+
+Or set them inline for the current session only:
+
+```{r eval=FALSE}
+Sys.setenv(
+  API_KEY          = "your-azure-api-token",
+  ASKR_OPENAI_BASE = "https://your-resource.cognitiveservices.azure.com",
+  ASKR_OSS_BASE    = "https://your-resource.services.ai.azure.com"
+)
+```
+
+## Run a first request
+
+```{r eval=FALSE}
+response <- ask(
+  prompt = "Explain supervised vs unsupervised learning in one paragraph.",
+  model = "gpt-4o",
+  temperature = 0.4
+)
+
+cat(response)
+```
+
+## Custom system prompt
+
+Override the default system prompt to give the model domain-specific context:
+
+```{r eval=FALSE}
+response <- ask(
+  prompt        = "Identify the three main leadership themes in this text: [text]",
+  model         = "mistral",
+  system_prompt = "You are an expert in organisational psychology and leadership development."
+)
+```
+
+## Extra API parameters
+
+Pass additional parameters supported by the Azure API (e.g., `max_tokens`, `top_p`):
+
+```{r eval=FALSE}
+response <- ask(
+  prompt       = "Summarise this document in bullet points.",
+  model        = "gpt-4o",
+  extra_params = list(max_tokens = 512L, top_p = 0.9)
+)
+```
+
+## Programmatic usage
+
+`ask_raw()` returns a structured `askr_response` object with status, model, and
+response fields — useful for programmatic control or debugging:
+
+```{r eval=FALSE}
+res <- ask_raw(
+  query         = "Extract 3 key risks from this text.",
+  model         = "mistral",
+  temperature   = 0.3,
+  system_prompt = "You are a risk analyst.",
+  extra_params  = list(max_tokens = 256L)
+)
+
+if (res$ok) {
+  cat(res$response)
+} else {
+  message("HTTP status: ", res$status)
+  message(res$response)
+}
+```
+
+`print()` truncates output at 500 characters by default. Use `max_chars = Inf`
+to see the full response:
+
+```{r eval=FALSE}
+print(res, max_chars = Inf)
+```
+
+## Discover available models
+
+```{r eval=FALSE}
+list_available_models()
+```
+
+## PII and sensitive data
+
+**Do not send raw personally identifiable information as a prompt.**
+
+The `query`/`prompt` argument is transmitted to an external Azure endpoint.
+Before passing research data to `ask()` or `ask_raw()`, ensure it has been:
+
+- De-identified (names, participant IDs, and contact details removed or pseudonymised)
+- Reviewed under your organisation's data governance policy for suitability of external AI processing
+- Checked against any IRB or ethics approval conditions that govern your study
+
+If you work with interview transcripts or survey responses, pass a summary or
+anonymised excerpt — not the raw text.
+
+```{r eval=FALSE}
+# Preferred: pass a pre-processed excerpt
+ask(
+  prompt = "Summarise the leadership themes in this anonymised excerpt: [excerpt]",
+  model  = "mistral"
+)
+
+# Avoid: raw participant data in the prompt
+# ask(prompt = raw_transcript_with_names, model = "mistral")  # don't do this
+```
+
+The `print()` method for `askr_response` objects truncates output at 500
+characters by default to avoid inadvertently echoing large volumes of model
+output to shared console sessions or log files. Use `print(res, max_chars = Inf)`
+to see the full response.
+
+For deeper implementation details, see the Architecture Overview vignette.

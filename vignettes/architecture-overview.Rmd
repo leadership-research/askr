@@ -1,0 +1,92 @@
+---
+title: "Architecture Overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Architecture Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette describes the `askr` architecture for maintainers and advanced users.
+
+## Public API
+
+| Function | Role |
+|---|---|
+| `ask()` | High-level helper. Returns plain text or a formatted error string. Never stops on HTTP errors. |
+| `ask_raw()` | Low-level interface. Returns a structured `askr_response` with `ok`, `status`, `model`, and `response`. |
+| `list_available_models()` | Lists enabled model aliases from the registry. |
+| `print.askr_response()` | S3 print method. Truncates at `max_chars = 500` by default. |
+
+Internal helpers (`load_model_registry()`, `resolve_model_info()`, `resolve_model()`) are not exported.
+
+## Request flow
+
+1. **Validate** — `query`/`prompt`, `model`, `temperature`, `system_prompt`, `extra_params` are checked for type and length. `query` is capped at 32,000 characters.
+2. **Auth** — `API_KEY` read from `Sys.getenv()`. Errors immediately if unset.
+3. **Endpoint check** — `ASKR_OPENAI_BASE` and `ASKR_OSS_BASE` verified non-empty.
+4. **Resolve model** — alias or engine name looked up in `inst/config/models.json` via `resolve_model_info()`. Only `enabled == TRUE` entries are matched.
+5. **Build URL** — provider determines which base URL and API version to use.
+6. **Build body** — `model`, `messages` (system + user), `temperature`, plus any `extra_params` (caller values override defaults).
+7. **Send request** — `httr2::req_perform()` with `req_error(is_error = ~FALSE)` so HTTP errors are handled by status inspection, not condition signalling.
+8. **Handle response** — non-200 returns `ok = FALSE` with truncated error body. 200 parses JSON and extracts `choices[[1]]$message$content`.
+9. **Return** — `askr_response` S3 object.
+
+## Routing model
+
+| Provider value in registry | Endpoint used |
+|---|---|
+| `"openai"` | `ASKR_OPENAI_BASE/openai/deployments/{engine}/chat/completions?api-version=ASKR_OPENAI_VER` |
+| Anything else | `ASKR_OSS_BASE/models/chat/completions?api-version=ASKR_OSS_VER` |
+
+## Configuration
+
+All configuration is via environment variables — no hardcoded values.
+
+| Variable | Required | Default |
+|---|---|---|
+| `API_KEY` | Yes | — |
+| `ASKR_OPENAI_BASE` | Yes | — |
+| `ASKR_OSS_BASE` | Yes | — |
+| `ASKR_OPENAI_VER` | No | `2025-01-01-preview` |
+| `ASKR_OSS_VER` | No | `2024-05-01-preview` |
+
+## Model registry
+
+Registry lives at `inst/config/models.json`. Each entry requires:
+
+```json
+{
+  "alias":    "mistral",
+  "engine":   "mistral-medium-2505",
+  "provider": "mistral",
+  "enabled":  true
+}
+```
+
+`provider` is the only field that affects routing (`"openai"` vs everything else).
+`alias` and `engine` are both valid as input to `ask()` / `ask_raw()`.
+
+## Response contract
+
+```r
+askr_response
+  ok:     TRUE/FALSE
+  status: <integer HTTP code, or NA on network failure>
+  model:  <resolved engine string>
+  response: <model text on success, error description on failure>
+```
+
+## Dependencies
+
+| Package | Role |
+|---|---|
+| `httr2` | HTTP client — request building, execution, response parsing |
+| `jsonlite` | Reads `models.json` registry via `fromJSON()` |

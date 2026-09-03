@@ -1,0 +1,38 @@
+[
+  {
+    "alias": "mistral",
+    "engine": "mistral-medium-2505",
+    "provider": "mistral",
+    "enabled": true
+  },
+  {
+    "alias": "gpt-4o",
+    "engine": "gpt-4o",
+    "provider": "openai",
+    "enabled": true
+  },
+  {
+    "alias": "gpt-5",
+    "engine": "gpt-5",
+    "provider": "openai",
+    "enabled": true
+  },
+  {
+    "alias": "llama4",
+    "engine": "Llama-4-Maverick-17B-128E-Instruct-FP8",
+    "provider": "meta",
+    "enabled": true
+  },
+  {
+    "alias": "phi4",
+    "engine": "Phi-4",
+    "provider": "microsoft",
+    "enabled": true
+  },
+  {
+    "alias": "deepseek_r1",
+    "engine": "DeepSeek-R1-0528",
+    "provider": "deepseek",
+    "enabled": true
+  }
+]

@@ -1,0 +1,31 @@
+Package: askr
+Type: Package
+Title: Ask AI Models Directly from R
+Version: 0.1.0
+Authors@R:
+    person("leadership-research", role = c("aut", "cre"))
+Description: askr provides a simple and extensible way for researchers,
+    data scientists, and analysts to interact with AI / Large Language Models (LLMs)
+    directly from R. It supports both hosted models (for example Azure OpenAI /
+    gpt-4o / gpt-5) and open-source models (for example Mistral, Llama, DeepSeek,
+    Phi). The package exposes a high-level helper for generating responses,
+    summarizing text, or extracting insights from documents, and a lower-level
+    helper for structured control of requests. Model definitions (alias, engine,
+    provider, enabled) are managed through a JSON registry that can be overridden
+    at runtime without modifying package code.
+License: Apache License (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends: R (>= 4.2.0)
+Imports:
+    httr2,
+    jsonlite
+Suggests:
+    knitr,
+    pkgdown,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
