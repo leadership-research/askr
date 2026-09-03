@@ -173,10 +173,9 @@ devtools::test()
 
 ### CI
 
-| Workflow       | Trigger                            | What it does                                      |
-| -------------- | ---------------------------------- | ------------------------------------------------- |
-| `check.yaml`   | Push / PR to `main`, `development` | R CMD check on Ubuntu + macOS, R release + oldrel |
-| `pkgdown.yaml` | Push to `main`                     | Builds and deploys pkgdown site to GitHub Pages   |
+| Workflow       | Trigger        | What it does                                    |
+| -------------- | -------------- | ----------------------------------------------- |
+| `pkgdown.yaml` | Push to `main` | Builds and deploys pkgdown site to GitHub Pages |
 
 Both workflows run a gitleaks secret scan before any deployment step.
 
