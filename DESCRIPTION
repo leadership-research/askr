@@ -3,7 +3,7 @@ Type: Package
 Title: Ask AI Models Directly from R
 Version: 0.1.0
 Authors@R:
-    person("leadership-research", role = c("aut", "cre"))
+    person("leadership-research", email = "leadership-research@noreply.github.com", role = c("aut", "cre"))
 Description: askr provides a simple and extensible way for researchers,
     data scientists, and analysts to interact with AI / Large Language Models (LLMs)
     directly from R. It supports both hosted models (for example Azure OpenAI /
@@ -13,6 +13,8 @@ Description: askr provides a simple and extensible way for researchers,
     helper for structured control of requests. Model definitions (alias, engine,
     provider, enabled) are managed through a JSON registry that can be overridden
     at runtime without modifying package code.
+URL: https://leadership-research.github.io/askr, https://github.com/leadership-research/askr
+BugReports: https://github.com/leadership-research/askr/issues
 License: Apache License (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
